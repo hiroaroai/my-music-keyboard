@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音楽キー</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .keys {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .key {
+            padding: 20px;
+            font-size: 20px;
+            background-color: #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .key:active {
+            background-color: #bbb;
+        }
+    </style>
+</head>
+<body>
+    <div class="keys">
+        <div class="key" id="key-x">x</div>
+        <div class="key" id="key-c">c</div>
+        <div class="key" id="key-v">v</div>
+        <div class="key" id="key-b">b</div>
+        <div class="key" id="key-n">n</div>
+        <div class="key" id="key-m">m</div>
+        <div class="key" id="key-comma">,</div>
+        <div class="key" id="key-period">.</div>
+        <div class="key" id="key-d">d</div>
+        <div class="key" id="key-f">f</div>
+        <div class="key" id="key-h">h</div>
+        <div class="key" id="key-j">j</div>
+        <div class="key" id="key-k">k</div>
+    </div>
+
+    <script>
+        // 音源のファイルパス
+        const sounds = {
+            'x': 'sounds/do.mp3',
+            'c': 'sounds/re.mp3',
+            'v': 'sounds/mi.mp3',
+            'b': 'sounds/fa.mp3',
+            'n': 'sounds/so.mp3',
+            'm': 'sounds/la.mp3',
+            ',': 'sounds/si.mp3',
+            '.': 'sounds/do_high.mp3',
+            'd': 'sounds/do_sharp.mp3',
+            'f': 'sounds/re_sharp.mp3',
+            'h': 'sounds/fa_sharp.mp3',
+            'j': 'sounds/so_sharp.mp3',
+            'k': 'sounds/la_sharp.mp3'
+        };
+
+        // 各キーが押されたときに音を鳴らす処理
+        function playSound(key) {
+            const audio = new Audio(sounds[key]);
+            audio.play();
+        }
+
+        // イベントリスナーを設定（クリック）
+        document.querySelectorAll('.key').forEach(key => {
+            key.addEventListener('click', () => {
+                playSound(key.id.replace('key-', ''));
+            });
+        });
+
+        // イベントリスナーを設定（キーボード）
+        window.addEventListener('keydown', (event) => {
+            if (sounds[event.key]) {
+                playSound(event.key);
+            }
+        });
+    </script>
+</body>
+</html>
