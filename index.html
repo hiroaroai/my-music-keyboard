@@ -14,39 +14,69 @@
             background-color: #f0f0f0;
             margin: 0;
         }
-        .keys {
+        .keyboard {
             display: flex;
-            gap: 10px;
-            justify-content: center;
+            position: relative;
         }
-        .key {
-            padding: 20px;
-            font-size: 20px;
-            background-color: #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
+        .white-key {
+            width: 60px;
+            height: 200px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin: 0 -1px;
+            position: relative;
+            z-index: 1;
         }
-        .key:active {
-            background-color: #bbb;
+        .white-key:active, .white-key.active {
+            background-color: #eee;
+        }
+        .black-key {
+            width: 40px;
+            height: 120px;
+            background-color: black;
+            border-radius: 4px;
+            margin-left: -20px;
+            margin-right: -20px;
+            position: absolute;
+            z-index: 2;
+            top: 0;
+        }
+        .black-key:active, .black-key.active {
+            background-color: #333;
+        }
+        .key-label {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: black;
+            pointer-events: none;
+        }
+        .black-key .key-label {
+            color: white;
         }
     </style>
 </head>
 <body>
-    <div class="keys">
-        <div class="key" id="key-x">x</div>
-        <div class="key" id="key-c">c</div>
-        <div class="key" id="key-v">v</div>
-        <div class="key" id="key-b">b</div>
-        <div class="key" id="key-n">n</div>
-        <div class="key" id="key-m">m</div>
-        <div class="key" id="key-comma">,</div>
-        <div class="key" id="key-period">.</div>
-        <div class="key" id="key-d">d</div>
-        <div class="key" id="key-f">f</div>
-        <div class="key" id="key-h">h</div>
-        <div class="key" id="key-j">j</div>
-        <div class="key" id="key-k">k</div>
+    <div class="keyboard">
+        <!-- 白鍵 -->
+        <div class="white-key" id="key-x"><div class="key-label">x (Do)</div></div>
+        <div class="white-key" id="key-c"><div class="key-label">c (Re)</div></div>
+        <div class="white-key" id="key-v"><div class="key-label">v (Mi)</div></div>
+        <div class="white-key" id="key-b"><div class="key-label">b (Fa)</div></div>
+        <div class="white-key" id="key-n"><div class="key-label">n (So)</div></div>
+        <div class="white-key" id="key-m"><div class="key-label">m (La)</div></div>
+        <div class="white-key" id="key-comma"><div class="key-label">, (Si)</div></div>
+        <div class="white-key" id="key-period"><div class="key-label">. (Do High)</div></div>
+
+        <!-- 黒鍵 -->
+        <div class="black-key" id="key-d" style="left: 40px;"><div class="key-label">d (#Do)</div></div>
+        <div class="black-key" id="key-f" style="left: 100px;"><div class="key-label">f (#Re)</div></div>
+        <div class="black-key" id="key-h" style="left: 220px;"><div class="key-label">h (#Fa)</div></div>
+        <div class="black-key" id="key-j" style="left: 280px;"><div class="key-label">j (#So)</div></div>
+        <div class="black-key" id="key-k" style="left: 340px;"><div class="key-label">k (#La)</div></div>
     </div>
 
     <script>
@@ -67,23 +97,55 @@
             'k': 'sounds/la_sharp.mp3'
         };
 
+        // 鍵盤にキーのマッピングを設定
+        const keyMappings = {
+            'x': 'key-x',
+            'c': 'key-c',
+            'v': 'key-v',
+            'b': 'key-b',
+            'n': 'key-n',
+            'm': 'key-m',
+            ',': 'key-comma',
+            '.': 'key-period',
+            'd': 'key-d',
+            'f': 'key-f',
+            'h': 'key-h',
+            'j': 'key-j',
+            'k': 'key-k'
+        };
+
         // 各キーが押されたときに音を鳴らす処理
         function playSound(key) {
+            if (!sounds[key]) return; // サウンドが定義されていないキーを無視
             const audio = new Audio(sounds[key]);
             audio.play();
         }
 
+        // 鍵盤を一時的に "active" 状態にする
+        function activateKey(key) {
+            const keyElement = document.getElementById(keyMappings[key]);
+            if (keyElement) {
+                keyElement.classList.add('active');
+                setTimeout(() => {
+                    keyElement.classList.remove('active');
+                }, 200); // 視覚効果の継続時間
+            }
+        }
+
         // イベントリスナーを設定（クリック）
-        document.querySelectorAll('.key').forEach(key => {
+        document.querySelectorAll('.white-key, .black-key').forEach(key => {
             key.addEventListener('click', () => {
-                playSound(key.id.replace('key-', ''));
+                const note = key.id.replace('key-', '');
+                playSound(note);
+                activateKey(note);
             });
         });
 
         // イベントリスナーを設定（キーボード）
         window.addEventListener('keydown', (event) => {
-            if (sounds[event.key]) {
+            if (keyMappings[event.key]) {
                 playSound(event.key);
+                activateKey(event.key);
             }
         });
     </script>
