@@ -11,12 +11,15 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f0f0;
             margin: 0;
+            overflow: hidden;
+            background-color: #008080; /* 青緑色 */
+            position: relative;
         }
         .keyboard {
             display: flex;
             position: relative;
+            z-index: 2;
         }
         .white-key {
             width: 60px;
@@ -57,6 +60,26 @@
         .black-key .key-label {
             color: white;
         }
+
+        /* 円形波のアニメーション */
+        .wave {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            animation: wave-animation 1s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes wave-animation {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(10);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -80,7 +103,6 @@
     </div>
 
     <script>
-        // 音源のファイルパス
         const sounds = {
             'x': 'sounds/do.mp3',
             'c': 'sounds/re.mp3',
@@ -97,7 +119,6 @@
             'k': 'sounds/la_sharp.mp3'
         };
 
-        // 鍵盤にキーのマッピングを設定
         const keyMappings = {
             'x': 'key-x',
             'c': 'key-c',
@@ -114,25 +135,46 @@
             'k': 'key-k'
         };
 
-        // 各キーが押されたときに音を鳴らす処理
-        function playSound(key) {
-            if (!sounds[key]) return; // サウンドが定義されていないキーを無視
-            const audio = new Audio(sounds[key]);
-            audio.play();
+        // 背景色変更なし (青緑色)
+        const body = document.body;
+
+        function changeBackgroundColor() {
+            body.style.backgroundColor = '#008080'; /* 青緑色 */
         }
 
-        // 鍵盤を一時的に "active" 状態にする
+        function playSound(key) {
+            if (!sounds[key]) return;
+            const audio = new Audio(sounds[key]);
+            audio.play();
+            changeBackgroundColor();
+            createWaveEffect();
+        }
+
+        function createWaveEffect() {
+            const wave = document.createElement('div');
+            wave.classList.add('wave');
+            wave.style.width = '100px';
+            wave.style.height = '100px';
+            wave.style.left = `${window.innerWidth / 2 - 50}px`;
+            wave.style.top = `${window.innerHeight / 2 - 50}px`;
+            body.appendChild(wave);
+
+            // アニメーション終了後に削除
+            setTimeout(() => {
+                wave.remove();
+            }, 1000);
+        }
+
         function activateKey(key) {
             const keyElement = document.getElementById(keyMappings[key]);
             if (keyElement) {
                 keyElement.classList.add('active');
                 setTimeout(() => {
                     keyElement.classList.remove('active');
-                }, 200); // 視覚効果の継続時間
+                }, 200);
             }
         }
 
-        // イベントリスナーを設定（クリック）
         document.querySelectorAll('.white-key, .black-key').forEach(key => {
             key.addEventListener('click', () => {
                 const note = key.id.replace('key-', '');
@@ -141,7 +183,6 @@
             });
         });
 
-        // イベントリスナーを設定（キーボード）
         window.addEventListener('keydown', (event) => {
             if (keyMappings[event.key]) {
                 playSound(event.key);
@@ -151,3 +192,4 @@
     </script>
 </body>
 </html>
+
